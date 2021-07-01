@@ -48,11 +48,13 @@ void loadInstructions(Instruction_Memory *i_mem, const char *trace)
 
 void parseRType(char *opr, Instruction *instr)
 {
+    //intializing the variables
     instr->instruction = 0;
     unsigned opcode = 0;
     unsigned funct3 = 0;
     unsigned funct7 = 0;
 
+    //setting the standard code for add
     if (strcmp(opr, "add") == 0)
     {
         opcode = 51;
@@ -60,17 +62,21 @@ void parseRType(char *opr, Instruction *instr)
         funct7 = 0;
     }
 
+    //finding the rd 
     char *reg = strtok(NULL, ", ");
     unsigned rd = regIndex(reg);
 
+    //finding the rs1
     reg = strtok(NULL, ", ");
     unsigned rs_1 = regIndex(reg);
 
+    //finding the rs2
     reg = strtok(NULL, ", ");
     reg[strlen(reg)-1] = '\0';
     unsigned rs_2 = regIndex(reg);
 
     // Contruct instruction
+    //each instruction is offset by it's length to full construct it
     instr->instruction |= opcode;
     instr->instruction |= (rd << 7);
     instr->instruction |= (funct3 << (7 + 5));
