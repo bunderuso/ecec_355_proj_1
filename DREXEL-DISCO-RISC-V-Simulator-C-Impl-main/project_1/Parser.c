@@ -85,6 +85,47 @@ void parseRType(char *opr, Instruction *instr)
     instr->instruction |= (funct7 << (7 + 5 + 3 + 5 + 5));
 }
 
+void parseIType(char *opr, Instruction *instr)
+{
+    //intializing the variables
+    instr->instruction = 0;
+    unsigned opcode = 0;
+    unsigned funct3 = 0;
+    unsigned funct7 = 0;
+
+    //setting the standard code for addi
+    if (strcmp(opr, "addi") == 0)
+    {
+        opcode = 19;
+        funct3 = 0;
+    }
+
+    //finding the rd 
+    char *reg = strtok(NULL, ", ");
+    unsigned rd = regIndex(reg);
+
+    //finding the rs1
+    reg = strtok(NULL, ", ");
+    unsigned rs_1 = regIndex(reg);
+
+    
+    //finding the immediate
+    reg = strtok(NULL, ", ");
+    reg[strlen(reg)-1] = '\0';
+    unsigned rs_2 = reg;
+    
+    
+
+    // Contruct instruction
+    //each instruction is offset by it's length to full construct it
+    instr->instruction |= opcode;
+    instr->instruction |= (rd << 7);
+    instr->instruction |= (funct3 << (7 + 5));
+    instr->instruction |= (rs_1 << (7 + 5 + 3));
+    instr->instruction |= (rs_2 << (7 + 5 + 3 + 5));
+    //instr->instruction |= (funct7 << (7 + 5 + 3 + 5 + 5));
+}
+
 int regIndex(char *reg)
 {
     unsigned i = 0;
