@@ -19,14 +19,36 @@ int main(int argc, const char *argv[])
     instr_mem.last = NULL;
     loadInstructions(&instr_mem, argv[1]);
 
+    unsigned PC = 0;
+    while (1)
+    {
+        Instruction *instr = &(instr_mem.instructions[PC / 4]);
+        printf("\nInstruction at PC: %u\n", PC);
+        unsigned mask = (1 << 31);
+        for (int i = 31; i >= 0; i--)
+        {
+            if (instr->instruction & mask) { printf("1 ");}
+            else { printf("0 "); }
+
+            mask >>= 1;
+        }
+        printf("\n");
+        if (instr == instr_mem.last) { break; }
+        PC += 4;
+    }
+
     /* Task Two */
     // TODO, implement Core.{h,c}
+    
     Core *core = initCore(&instr_mem);
-
+    
     /* Task Three - Simulation */
     while (core->tick(core));
-
+    
+    
     printf("Simulation is finished.\n");
+    printf("Value at x9: %ld\n", core->reg_file[9]);
+    printf("Value at x11: %ld\n", core->reg_file[11]);
 
     free(core);    
 }

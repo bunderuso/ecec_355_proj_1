@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 #define BOOL bool
 
@@ -55,7 +56,7 @@ Signal ALUControlUnit(Signal ALUOp,
                       Signal Funct3);
 
 // FIXME (3). Imme. Generator
-Signal ImmeGen(Signal input);
+Signal ImmeGen(int *binary_imm);
 
 // FIXME (4). ALU
 void ALU(Signal input_0,
@@ -75,5 +76,8 @@ Signal Add(Signal input_0,
 
 // (6). ShiftLeft1
 Signal ShiftLeft1(Signal input);
+
+//to decimal function 
+int bin_to_dec(int n);
 
 #endif
