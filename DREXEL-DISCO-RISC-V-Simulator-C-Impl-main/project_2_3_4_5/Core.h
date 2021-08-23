@@ -3,6 +3,8 @@
 
 #include "Instruction_Memory.h"
 
+#include "set.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -79,5 +81,15 @@ Signal ShiftLeft1(Signal input);
 
 //to decimal function 
 int bin_to_dec(int n);
+
+int opcode_parse( int * imme_binary);
+int rdParse(int instr[]);
+int funct3Parse(int instr[]);
+int rs1Parse(int instr[], Core* core);
+int *Itype_immediate(int instrFetch[]);
+int rs2Parse(int instr[]);
+int funct7Parse(int instr[]);
+void RType(struct node * curInstr, Core *core, ControlSignals *signals);
+void ld(struct node * curInstr, Core *core, ControlSignals *signals);
 
 #endif

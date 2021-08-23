@@ -1,0 +1,12 @@
+1. Add function information for each step, as in figure out what variables need to be passed in since we are dealing with functions now and not if-statements
+  1.1 Look at the variables in- use throughout the functions to see what wee need in there since additional functions may need to be called upon 
+
+2. Use Ben's linked list functions to add the needed details for each step. // 
+  2.1 Details include fetch, execute, opcode, funct3, memory, etc 
+
+3. Ensure the pipeclock counter is counting correctly and we can move through the linked list without any issues
+  3.1 Perhaps make a global linked list variable so we can always move forward when the pipeline resets after each clock cycle 
+
+4. Debug like crazy
+
+I think that is everything that needs to be done 

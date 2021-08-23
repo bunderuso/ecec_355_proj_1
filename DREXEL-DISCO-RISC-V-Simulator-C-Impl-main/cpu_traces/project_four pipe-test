@@ -1,0 +1,63 @@
+cycle 1:
+  F
+
+cycle 2:
+  F-D
+    F
+
+cycle 3:
+  F-D-E
+    F-D
+      F
+
+cycle 4:
+  F-D-E-M
+    F-D-E
+      F-D
+        F
+
+cycle 5:
+  F-D-E-M-W
+    F-D-E-M
+      F-D-E
+        F-D
+          F
+
+cycle 6:
+  F-D-E-M-W
+    F-D-E-M-W
+      F-D-E-M
+        F-D-E
+          F-D
+            F
+
+cycle 7:
+  F-D-E-M-W
+    F-D-E-M-W
+      F-D-E-M-W
+        F-D-E-M
+          F-D-E
+            F-D
+cycle 8:
+  F-D-E-M-W
+    F-D-E-M-W
+      F-D-E-M-W
+        F-D-E-M-W
+          F-D-E-M
+            F-D-E
+cycle 9:
+  F-D-E-M-W
+    F-D-E-M-W
+      F-D-E-M-W
+        F-D-E-M-W
+          F-D-E-M-W
+            F-D-E-M
+
+cycle 10:
+  cycle 9:
+  F-D-E-M-W
+    F-D-E-M-W
+      F-D-E-M-W
+        F-D-E-M-W
+          F-D-E-M-W
+            F-D-E-M-W

@@ -1,0 +1,38 @@
+
+cc := gcc
+CONV := pandoc
+
+all : ll arrs
+
+ll : main.o ll.o 
+	$(cc) main.o ll.o -o ll
+
+arrs : main.o arrs.o
+	$(cc) main.o arrs.o -o arrs
+
+
+main.o : main.c set.h
+	$(cc) -c main.c
+
+ll.o : ll.c set.h
+	$(cc) -c ll.c
+
+arrs.o : arrs.c set.h
+	$(cc) -c arrs.c
+
+README.html : README.md
+	$(CONV) $(mflags) -o README.html README.md
+
+README : README.md
+	$(CONV) $(mflags) -t plain -o README README.html README.md
+
+README.pdf : README.md
+	$(CONV) $(mflags) -o README.pdf README.md
+
+.PHONY : clean
+
+clean :
+	-rm *.o
+	-rm ll
+	-rm arrs
+

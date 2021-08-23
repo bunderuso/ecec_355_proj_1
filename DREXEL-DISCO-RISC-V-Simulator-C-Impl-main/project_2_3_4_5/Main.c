@@ -3,6 +3,8 @@
 #include "Core.h"
 #include "Parser.h"
 
+
+
 int main(int argc, const char *argv[])
 {	
     if (argc != 2)
@@ -45,10 +47,12 @@ int main(int argc, const char *argv[])
     /* Task Three - Simulation */
     while (core->tick(core));
     
-    
     printf("Simulation is finished.\n");
-    printf("Value at x9: %ld\n", core->reg_file[9]);
+    printf("Value at x10: %ld\n", core->reg_file[10]);
+    printf("Value at x13: %ld\n", core->reg_file[13]);
     printf("Value at x11: %ld\n", core->reg_file[11]);
+    printf("Value at x12: %ld\n", core->reg_file[12]);
+    printf("Value at x14: %ld\n", core->reg_file[14]);
 
     free(core);    
 }
