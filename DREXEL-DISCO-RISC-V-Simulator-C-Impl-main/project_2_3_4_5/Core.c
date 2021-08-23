@@ -18,19 +18,21 @@ struct node {
   int fetch[32]; //either "static int fetch[32];" or "int *fetch;"
   int opcode; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
   int execResult; 
-  int rd; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int funct3; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int rs1; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int rs2; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int funct7; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm11_0; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm11_5; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm12_10_5; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm31_12; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm20_10_1_11_19_12; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm4_0; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm4_1_11; //value based on certain bits of int fetch, which is assigned during the decode stage based on opcode
-  int imm11_0_sign_extended; //
+  int memAddr;
+  int memVal;
+  int rd; 
+  int funct3; 
+  int rs1; 
+  int rs2; 
+  int funct7; 
+  int imm11_0; 
+  int imm11_5; 
+  int imm12_10_5; 
+  int imm31_12; 
+  int imm20_10_1_11_19_12;
+  int imm4_0; 
+  int imm4_1_11; 
+  int imm11_0_sign_extended; 
 	struct node *next ;
 } ;
 
@@ -47,7 +49,7 @@ Set* set()
 	return rv ;
 }
 
-size_t	setSize( const Set* s ) 
+size_t setSize( const Set* s ) 
 {
 	size_t length = 0 ; 
 	
@@ -71,7 +73,6 @@ bool setFind( const Set* s, const char* x ) //TODO: determine if this method is 
 bool setInsert( Set* s, int *fetch ) //TODO: test this method to see if the memcpy statements are correct
 //TODO: setInsert currently returns a bool; there really isn't a way for memcpy to fail unless the arguments that it is called with are overlapping or otherwise flawed
 {
-
 	node *newNode;
 	newNode = malloc(sizeof(node));
 
@@ -79,11 +80,12 @@ bool setInsert( Set* s, int *fetch ) //TODO: test this method to see if the memc
       newNode->fetch[i] = fetch[i];
   }
 
+  
+
 	newNode->next = s->head; 
 	s->head = newNode ; 
 	s->n = s->n + 1; 
 	return true;
-
 }
 
 void setKill( Set* s ) 
@@ -149,9 +151,9 @@ Core *initCore(Instruction_Memory *i_mem)
     core->reg_file[5] = 30;
     core->reg_file[6] = -35;
 
-    //core->data_mem[5]= 63;
-    //printf("This is the memboi: %d\n", core->data_mem[5] * -1);
-    //core->data_mem[6]= 63; 
+    core->data_mem[5]= -63;
+    //printf("This is the memboi: %d\n", core->data_mem[5] );
+    core->data_mem[6]= 63; 
     // test configurations can be found below - please only uncomment 1 test configuration at a time in order to obtain "expected" output
     /*
     core->reg_file[25] = 4; // test configuration 1
@@ -199,11 +201,10 @@ Core *initCore(Instruction_Memory *i_mem)
     core->data_mem[31]=0; //00000000 
 
     core->reg_file[22] = 1; // test configuration 4
-
     */
     return core;
 }
-
+// TODO: delete this incorrect placement of ctrl signal lines
 //intializing the control signal lines 
 //ControlSignals *signals = (ControlSignals *)malloc(sizeof(ControlSignals));
 
@@ -320,7 +321,6 @@ int rdParse(int instr[]){
   return deci_rd_comp;
 }
 
-
 //if (deci_opcode == 19 || deci_opcode == 3)
 int *Itype_immediate(int instrFetch[]){
   // code block below finds the Immediate in decimal for i-types
@@ -335,11 +335,11 @@ int *Itype_immediate(int instrFetch[]){
       }
       counter--;
   }
-  printf("Deci imm in function:");
+  //printf("Deci imm in function:");
   for(int j = 11; j>=0; j--){
-    printf("%d", deci_imm[j]);
+    //printf("%d", deci_imm[j]);
   }
-  printf("\n");
+  //printf("\n");
   /*these were likely written when immeGen was fucky*/
   //int immediate_binary = atoi(deci_imm);
   //deci_immediate = bin_to_dec(immediate_binary);
@@ -476,12 +476,10 @@ int bne(){
 */
 //STEP 2.5
 //calling the ALU function
-//we need to find the register 1 and register 2 in the case of a non-immediate function 
 
-// TODO: Check ALU, negative values are not getting registered correctly
 //Calling Add in the ALU
 //if(deci_opcode == 51)
-void RType(struct node * curInstr, Core *core, ControlSignals *signals){ //TODO: list of arguments: "imme_binary, alu_signal, "
+void RType(struct node * curInstr, Core *core, ControlSignals *signals){
     int reg2 = curInstr->rs2;
     int rd = curInstr->rd;
     int reg1 = curInstr->rs1;
@@ -493,11 +491,12 @@ void RType(struct node * curInstr, Core *core, ControlSignals *signals){ //TODO:
     int64_t *zero = malloc(sizeof(int64_t));; //long int *zero = 0;
     ALU(core->reg_file[reg1], core->reg_file[reg2], alu_signal, ALU_result, zero); 
 
-    core->reg_file[rd] = *ALU_result;  // save this line for next stage?
-    printf("rd: %d\n", rd);
-    printf("reg1: %d\n", core->reg_file[reg1]);
-    printf("reg2: %d\n", core->reg_file[reg2]);
-    printf("%d\n", *ALU_result);
+    //core->reg_file[rd] = *ALU_result;  // save this line for next stage?
+    curInstr->execResult = *ALU_result;
+    //printf("rd: %d\n", rd);
+    //printf("reg1: %d\n", core->reg_file[reg1]);
+    //printf("reg2: %d\n", core->reg_file[reg2]);
+    //printf("%d\n", *ALU_result);
     // return ALU result for memory/writeback stages??   
 }
 
@@ -516,19 +515,17 @@ void addi(struct node * curInstr, Core *core){
 // for slli
 //else if(deci_opcode == 19 && deci_funct3 == 1)
 void slli(struct node * curInstr, Core *core){
-
     int rd = curInstr->rd;
     int reg1 = curInstr->rs1;
     int sign_extended = curInstr->imm11_0;
     int temp = 0;
     temp = reg1 << sign_extended;
     core->reg_file[rd] = temp;
-
 }
 
 // for LD
 //else if(deci_opcode == 3 && deci_funct3 == 3)
-void ld(struct node * curInstr, Core *core, ControlSignals *signals){
+void ldExec(struct node * curInstr, Core *core, ControlSignals *signals){
 
     int immediate = curInstr->imm11_0_sign_extended;
     int address_offset = immediate/8;
@@ -541,21 +538,27 @@ void ld(struct node * curInstr, Core *core, ControlSignals *signals){
     int64_t *zero = malloc(sizeof(int64_t));; //long int *zero = 0;
     ALU(core->reg_file[reg1], address_offset, alu_signal, ALU_result, zero); 
 
+    curInstr->memAddr = *ALU_result;
+}
+
+void ldMem(struct node * curInstr, Core *core, ControlSignals *signals){
+    //==========================================================
+    //Start of MEM Stage by obtaining the memory adress
+
     //grabbing the data stored at the address
     int mem_value = 0;
-    mem_value = core->data_mem[*ALU_result];
-    printf("This is the memboi: %d\n", core->data_mem[*ALU_result]);
-
-    //storing the memory value into 9
-    // TODO: ^ why was this hardcoded to 9? changed to rd
-    core->reg_file[rd] = mem_value;
-
+    mem_value = core->data_mem[curInstr->memAddr];
+    curInstr->execResult = mem_value;
+    //printf("This is the curInstr->memAddr: %d\n", curInstr->memAddr);
 }
-// FIXME, implement this function
+    //==========================================================
+void WB(struct node * curInstr, Core *core, ControlSignals *signals){
+    int rd = curInstr->rd;
+    core->reg_file[rd] = curInstr->execResult;
+}
+
 bool tickFunc(Core *core)
 {
-    // TODO: find appropriate place to grab alu signal 
-    // ALU SIGNAL DECLARED AND CTRL UNIT FUNCTION NOW CALLED IN EXECUTION STAGE
     /*   
     int64_t alu_signal; //TODO: this is supposed to be of the typedeffed "Signal" type
     alu_signal = ALUControlUnit(signals->ALUOp, deci_funct7, deci_funct3);
@@ -574,20 +577,20 @@ bool tickFunc(Core *core)
     //figuring out how many clock cycles will be in the pipeline 
     int total_cycles = 0;
     
-    total_cycles = 5 + ( (core->instr_mem->last->addr / 4) - 1); //TODO: evaulate if core->instr_mem->last->addr should return either 20 or 19(that'd be a problem)
+    total_cycles = 5 + ((core->instr_mem->last->addr / 4) - 1); //TODO: evaulate if core->instr_mem->last->addr should return either 20 or 19(that'd be a problem)
 
     struct node* curDecode = NULL; //the current node to be decoded
     struct node* curExecute = NULL; //the current node to be executed
     int curOpCode;
     int* deci_imm;
-//
+
     char deci_1[9] = "\0";
     char a_1[2] = "1";
     char a_0[2] = "0";
     
     unsigned instruction = 0;
 
-    //creating pipeline while-loop
+    // creating pipeline while-loop
     while(pipe_cycle <= 10){
       //printf("%d\n", pipe_cycle);
       // Steps may include
@@ -617,29 +620,6 @@ bool tickFunc(Core *core)
           }
       
       //Here is where the binary form of instruction is stored in the pipeline linked list 
-      
-      /*
-        PLAN - processing while loop Planning:
-        starting at cycle 1, fetching begins. At cycle 5 fetching stops.
-          need if statement to check these 
-        starting at cycle 2, decoding begins. At cycle 6 decoding stops
-          need if statement to check these 
-        starting at cycle 3, execution begins. At cycle 7 execution stops 
-          need if statement to check these 
-        starting at cycle 4, memory begins. At cycle 8 memory stops 
-          need if statement to check these 
-        starting at cycle 5, writeback begins. At cycle 9 writeback stops 
-          need if statement to check these 
-      */
-
-      /*
-      switch pipe_cycle == 1:
-        fetch inst 1
-      
-      switch pipe_cycle ==2:
-        decode inst 1
-        fetch inst 2
-      */
 
       // FETCH
       if(pipe_cycle >= 1 && pipe_cycle <= 5){ //TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
@@ -654,10 +634,8 @@ bool tickFunc(Core *core)
       }
 
       // DECODE 
-      if(pipe_cycle >=2 && pipe_cycle <=6){//TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
-        /*
-        PLAN: fill this if statement with the function call to
-        */
+      if(pipe_cycle >=2 && pipe_cycle <=6){//TODO: make the int values of this if-statment variable dependent so they work for any number of instructions
+
         if ( pipe_cycle <= 5 ){
           curDecode = pipeInstrs->head->next;
         }
@@ -693,19 +671,19 @@ bool tickFunc(Core *core)
       }
 
       // EXECUTION 
-      if(pipe_cycle >=3 && pipe_cycle <=7){//TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
+      if(pipe_cycle >=3 && pipe_cycle <=7){//TODO: make the int values of this if-statment variable dependent so they work for any number of instructions
 
         //calling the control unit function 
         int deci_opcode = curDecode->opcode;
         ControlUnit(deci_opcode, signals);
 
-        if ( pipe_cycle <= 6 ){
+        if ( pipe_cycle <= 5 ){
           curExecute = pipeInstrs->head->next->next;
         }
-        if ( pipe_cycle == 6 + 1 ) { //catches Cycle 7
+        if ( pipe_cycle == 5 + 1 ) { //catches Cycle 7
           curExecute = pipeInstrs->head->next;
         }
-        if ( pipe_cycle == 6 + 2 ) { //catches Cycle 8
+        if ( pipe_cycle == 5 + 2 ) { //catches Cycle 8
           curExecute = pipeInstrs->head;
         }
 
@@ -729,26 +707,75 @@ bool tickFunc(Core *core)
           sign_extended = ImmeGen(deci_imm);
           curExecute->imm11_0 = *binary_immediate;
           curExecute->imm11_0_sign_extended = sign_extended;
-          printf("THis is the signextened: %d\n", curExecute->imm11_0_sign_extended);
+          //printf("This is the signextened: %d\n", curExecute->imm11_0_sign_extended);
           // ld function call
           if (curExecute->funct3 == 3){
-            ld(curExecute, core, signals);
+            ldExec(curExecute, core, signals);
           }
         }
       }
 
       // MEMORY
       if(pipe_cycle >=4 && pipe_cycle <=8){//TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
-        /*
-        PLAN: fill this if statement with the function call to
-        */
+
+        //calling the control unit function 
+        int deci_opcode = curDecode->opcode;
+        ControlUnit(deci_opcode, signals);
+
+        //catchs cycles 4 and 5
+        if ( pipe_cycle <= 5 ){
+          curExecute = pipeInstrs->head->next->next->next;
+        }
+        if ( pipe_cycle == 5 + 1 ) { //catches Cycle 6
+          curExecute = pipeInstrs->head->next->next;
+        }
+        if ( pipe_cycle == 5 + 2 ) { //catches Cycle 7
+          curExecute = pipeInstrs->head->next;
+        }
+        if ( pipe_cycle == 5 + 3 ) { //catches Cycle 8
+          curExecute = pipeInstrs->head;
+        }
+
+        curOpCode = curExecute->opcode;
+        //printf("This is the opcode: %d\n", curOpCode);
+        
+        // check for i type
+        if (curOpCode == 19 || curOpCode == 3){
+          
+          // ld function call
+          if (curExecute->funct3 == 3){
+            ldMem(curExecute, core, signals);
+          }
+        }
       }
 
       // WRITE BACK
       if(pipe_cycle >=5 && pipe_cycle <=9){//TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
-        /*
-        PLAN: fill this if statement with the function call to
-        */
+
+        int deci_opcode = curDecode->opcode;
+        ControlUnit(deci_opcode, signals);
+
+        //catchs cycle 5
+        if ( pipe_cycle == 5 ){
+          curExecute = pipeInstrs->head->next->next->next->next;
+        }
+        if ( pipe_cycle == 5 + 1 ) { //catches Cycle 6
+          curExecute = pipeInstrs->head->next->next->next;
+        }
+        if ( pipe_cycle == 5 + 2 ) { //catches Cycle 7
+          curExecute = pipeInstrs->head->next->next;
+        }
+        if ( pipe_cycle == 5 + 3 ) { //catches Cycle 8
+          curExecute = pipeInstrs->head->next;
+        }
+        if ( pipe_cycle == 5 + 4 ) { //catches Cycle 9
+          curExecute = pipeInstrs->head;
+        }
+
+        curOpCode = curExecute->opcode;
+        //printf("This is the opcode: %d\n", curOpCode);  
+        WB(curExecute, core, signals);
+          
       }
 
       pipe_cycle++;
@@ -958,7 +985,7 @@ Signal ImmeGen(int *binary_imm)
           }
       }
 
-      printf("%s\n", deci_chars);
+      //printf("%s\n", deci_chars);
 
         //converting it to decimal
         int temp = atoi(deci_chars);

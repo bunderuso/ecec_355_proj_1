@@ -53,6 +53,10 @@ int main(int argc, const char *argv[])
     printf("Value at x11: %ld\n", core->reg_file[11]);
     printf("Value at x12: %ld\n", core->reg_file[12]);
     printf("Value at x14: %ld\n", core->reg_file[14]);
+    printf("Value at x5: %ld\n", core->reg_file[5]);
+    printf("Value at data mem 5: %ld\n", core->data_mem[5]);
+    printf("Value at x6: %ld\n", core->reg_file[6]);
+    printf("Value at data mem 6: %ld\n", core->data_mem[6]);
 
     free(core);    
 }

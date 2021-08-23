@@ -29,7 +29,7 @@ cycle 6:
       F-D-E-M
         F-D-E
           F-D
-            F
+
 
 cycle 7:
   F-D-E-M-W
@@ -37,27 +37,17 @@ cycle 7:
       F-D-E-M-W
         F-D-E-M
           F-D-E
-            F-D
+
 cycle 8:
   F-D-E-M-W
     F-D-E-M-W
       F-D-E-M-W
         F-D-E-M-W
           F-D-E-M
-            F-D-E
+
 cycle 9:
   F-D-E-M-W
     F-D-E-M-W
       F-D-E-M-W
         F-D-E-M-W
           F-D-E-M-W
-            F-D-E-M
-
-cycle 10:
-  cycle 9:
-  F-D-E-M-W
-    F-D-E-M-W
-      F-D-E-M-W
-        F-D-E-M-W
-          F-D-E-M-W
-            F-D-E-M-W

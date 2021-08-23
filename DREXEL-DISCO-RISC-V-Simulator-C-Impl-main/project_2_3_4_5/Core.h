@@ -90,6 +90,8 @@ int *Itype_immediate(int instrFetch[]);
 int rs2Parse(int instr[]);
 int funct7Parse(int instr[]);
 void RType(struct node * curInstr, Core *core, ControlSignals *signals);
-void ld(struct node * curInstr, Core *core, ControlSignals *signals);
+void ldExec(struct node * curInstr, Core *core, ControlSignals *signals);
+void ldMem(struct node * curInstr, Core *core, ControlSignals *signals);
+void WB(struct node * curInstr, Core *core, ControlSignals *signals);
 
 #endif
