@@ -1,8 +1,7 @@
 #include <stdio.h>
-
+#include <math.h>
 #include "Core.h"
 #include "Parser.h"
-
 
 
 int main(int argc, const char *argv[])
@@ -47,16 +46,42 @@ int main(int argc, const char *argv[])
     /* Task Three - Simulation */
     while (core->tick(core));
     
-    printf("Simulation is finished.\n");
+    printf("\nSimulation is finished.\n");
     printf("Value at x10: %ld\n", core->reg_file[10]);
-    printf("Value at x13: %ld\n", core->reg_file[13]);
     printf("Value at x11: %ld\n", core->reg_file[11]);
     printf("Value at x12: %ld\n", core->reg_file[12]);
+    printf("Value at x13: %ld\n", core->reg_file[13]);
     printf("Value at x14: %ld\n", core->reg_file[14]);
     printf("Value at x5: %ld\n", core->reg_file[5]);
-    printf("Value at data mem 5: %ld\n", core->data_mem[5]);
-    printf("Value at x6: %ld\n", core->reg_file[6]);
-    printf("Value at data mem 6: %ld\n", core->data_mem[6]);
+    
+    int data_5;
+    int signed_data5;
+    int dec;
+
+    for (int j = 47; j >= 40; j--){
+      data_5 += core->data_mem[j];
+    }
+    
+    for (int j = 7; j>= 0; j--){
+      if (j > 0){
+        data_5 -= core->data_mem[j+40] * pow(2,j);
+      }
+      else{
+        data_5 -= core->data_mem[40];
+      }
+      
+    }
+
+    //signed_data5 = signedBinary(data_5);
+    //dec = bin_to_dec(data_5);
+    //printf("63 in signedBinary: %d\n", signedBinary(63))
+    
+
+    //printf("Value at data mem 5: %d\n", data_5);
+
+    //printf("Value at data mem 5: %d\n", core->data_mem[40]);
+    //printf("Value at x6: %ld\n", core->reg_file[6]);
+    //printf("Value at data mem 6: %d\n", core->data_mem[48]);
 
     free(core);    
 }

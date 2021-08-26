@@ -94,4 +94,5 @@ void ldExec(struct node * curInstr, Core *core, ControlSignals *signals);
 void ldMem(struct node * curInstr, Core *core, ControlSignals *signals);
 void WB(struct node * curInstr, Core *core, ControlSignals *signals);
 
+
 #endif

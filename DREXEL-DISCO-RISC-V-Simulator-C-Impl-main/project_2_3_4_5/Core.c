@@ -70,17 +70,14 @@ bool setFind( const Set* s, const char* x ) //TODO: determine if this method is 
 }
 */
 
-bool setInsert( Set* s, int *fetch ) //TODO: test this method to see if the memcpy statements are correct
-//TODO: setInsert currently returns a bool; there really isn't a way for memcpy to fail unless the arguments that it is called with are overlapping or otherwise flawed
+bool setInsert( Set* s, int *fetch )
 {
 	node *newNode;
 	newNode = malloc(sizeof(node));
 
   for(int i = 0; i<=32; i++){
       newNode->fetch[i] = fetch[i];
-  }
-
-  
+  }  
 
 	newNode->next = s->head; 
 	s->head = newNode ; 
@@ -144,6 +141,16 @@ Core *initCore(Instruction_Memory *i_mem)
         core->reg_file[i] = 0;
     }
     
+
+    //core->data_mem[5]= -63; // 40->48 for -63
+    //core->data_mem[5]= 193; //oops, too big
+    //printf("This is the memboi: %d\n", core->data_mem[5] );
+    //core->data_mem[6] = 63; // 48->56 for 63
+    //core->data_mem[6] = 193; 
+    // test configurations can be found below - please only uncomment 1 test configuration at a time in order to obtain "expected" output
+
+    //-63 to 2's compliment: 1111111111111111111111111111111111111111111111111111111111000001
+
     core->reg_file[1] = 0;
     core->reg_file[2] = 10;
     core->reg_file[3] = -15;
@@ -152,34 +159,10 @@ Core *initCore(Instruction_Memory *i_mem)
     core->reg_file[6] = -35;
 
     core->data_mem[5]= -63;
-    //printf("This is the memboi: %d\n", core->data_mem[5] );
-    core->data_mem[6]= 63; 
-    // test configurations can be found below - please only uncomment 1 test configuration at a time in order to obtain "expected" output
+    core->data_mem[6]= 63;
+
+
     /*
-    core->reg_file[25] = 4; // test configuration 1
-    core->reg_file[10] = 4; // test configuration 2
-
-    // THis is the 3rd test configuration:
-    //this is arr[0] = 16
-    core->data_mem[0]= 16; //00010000
-    core->data_mem[1]= 0; //00000000 
-    core->data_mem[2]= 0; //00000000 
-    core->data_mem[3]= 0; //00000000 
-    core->data_mem[4]= 0; //00000000 
-    core->data_mem[5]= 0; //00000000 
-    core->data_mem[6]= 0; //00000000 
-    core->data_mem[7]= 0; //00000000 
-
-    //this is arr[1] = 128
-    core->data_mem[8]= 128; //00000000 
-    core->data_mem[9]= 0; //00000000 
-    core->data_mem[10]= 0; //00000000 
-    core->data_mem[11]= 0; //00000000 
-    core->data_mem[12]= 0; //00000000 
-    core->data_mem[13]= 0; //00000000 
-    core->data_mem[14]= 0; //00000000 
-    core->data_mem[15]= 0; //00000000 
-    
     //this is arr[2] = 8
     core->data_mem[16]= 8; //00000000 
     core->data_mem[17]= 0; //00000000 
@@ -199,14 +182,9 @@ Core *initCore(Instruction_Memory *i_mem)
     core->data_mem[29]=0; //00000000 
     core->data_mem[30]=0; //00000000 
     core->data_mem[31]=0; //00000000 
-
-    core->reg_file[22] = 1; // test configuration 4
     */
     return core;
 }
-// TODO: delete this incorrect placement of ctrl signal lines
-//intializing the control signal lines 
-//ControlSignals *signals = (ControlSignals *)malloc(sizeof(ControlSignals));
 
 int opcode_parse(int * imme_binary){
   char deci_1[9] = "\0";
@@ -225,10 +203,6 @@ int opcode_parse(int * imme_binary){
   //printf("This is the deciopcde: %d", deci_opcode);
   return deci_opcode;
 } 
-
-//STEP 2.3
-//Calling the ALU control unit 
-//to do this we need to find the Funct3 and Funct7 in decimal 
 
 // code block below finds the Funct 3 in decimal
 int funct3Parse(int instr[]){ 
@@ -335,20 +309,13 @@ int *Itype_immediate(int instrFetch[]){
       }
       counter--;
   }
-  //printf("Deci imm in function:");
-  for(int j = 11; j>=0; j--){
-    //printf("%d", deci_imm[j]);
-  }
-  //printf("\n");
-  /*these were likely written when immeGen was fucky*/
-  //int immediate_binary = atoi(deci_imm);
-  //deci_immediate = bin_to_dec(immediate_binary);
-  //sign_extended = ImmeGen(deci_imm);
   return deci_imm;
 }
+
 // immediate generation for bne instruction
 //else if (deci_opcode == 99)
 /*
+//function commented out as not strictly required for project 4
 int bne(){
   // code block below finds the Immediate in decimal for bne
   //getting register 2 in decimal form
@@ -477,8 +444,7 @@ int bne(){
 //STEP 2.5
 //calling the ALU function
 
-//Calling Add in the ALU
-//if(deci_opcode == 51)
+//Calling ALU for R type instructions
 void RType(struct node * curInstr, Core *core, ControlSignals *signals){
     int reg2 = curInstr->rs2;
     int rd = curInstr->rd;
@@ -492,12 +458,7 @@ void RType(struct node * curInstr, Core *core, ControlSignals *signals){
     ALU(core->reg_file[reg1], core->reg_file[reg2], alu_signal, ALU_result, zero); 
 
     //core->reg_file[rd] = *ALU_result;  // save this line for next stage?
-    curInstr->execResult = *ALU_result;
-    //printf("rd: %d\n", rd);
-    //printf("reg1: %d\n", core->reg_file[reg1]);
-    //printf("reg2: %d\n", core->reg_file[reg2]);
-    //printf("%d\n", *ALU_result);
-    // return ALU result for memory/writeback stages??   
+    curInstr->execResult = *ALU_result; 
 }
 
 //For ADDI
@@ -524,7 +485,6 @@ void slli(struct node * curInstr, Core *core){
 }
 
 // for LD
-//else if(deci_opcode == 3 && deci_funct3 == 3)
 void ldExec(struct node * curInstr, Core *core, ControlSignals *signals){
 
     int immediate = curInstr->imm11_0_sign_extended;
@@ -534,8 +494,8 @@ void ldExec(struct node * curInstr, Core *core, ControlSignals *signals){
     //calling the ALU function 
     int64_t alu_signal;
     alu_signal = ALUControlUnit(signals->ALUOp, curInstr->funct7, curInstr->funct3);
-    int64_t *ALU_result = malloc(sizeof(int64_t));; //long int *ALU_result = 0;
-    int64_t *zero = malloc(sizeof(int64_t));; //long int *zero = 0;
+    int64_t *ALU_result = malloc(sizeof(int64_t));; 
+    int64_t *zero = malloc(sizeof(int64_t));; 
     ALU(core->reg_file[reg1], address_offset, alu_signal, ALU_result, zero); 
 
     curInstr->memAddr = *ALU_result;
@@ -548,7 +508,28 @@ void ldMem(struct node * curInstr, Core *core, ControlSignals *signals){
     //grabbing the data stored at the address
     int mem_value = 0;
     mem_value = core->data_mem[curInstr->memAddr];
-    curInstr->execResult = mem_value;
+
+    //convert mem value to binary 
+    
+    //printf("This is memvalue: %d\n", mem_value);
+    int * data;
+    data = binary(mem_value);
+    /*
+    for(int g = 31; g >= 0; g--){
+        printf("%d", data[g]);
+      }
+      printf("\n");
+    */
+    if(data[7] == 1){
+
+      int mem_final = mem_value - 256;
+      curInstr->execResult = mem_final;
+    }
+    else{
+      //printf("This is memvalue: %d\n", mem_value);
+      int mem_final = mem_value;
+      curInstr->execResult = mem_final;
+    }
     //printf("This is the curInstr->memAddr: %d\n", curInstr->memAddr);
 }
     //==========================================================
@@ -558,21 +539,14 @@ void WB(struct node * curInstr, Core *core, ControlSignals *signals){
 }
 
 bool tickFunc(Core *core)
-{
-    /*   
-    int64_t alu_signal; //TODO: this is supposed to be of the typedeffed "Signal" type
-    alu_signal = ALUControlUnit(signals->ALUOp, deci_funct7, deci_funct3);
-    */
-    //STEP 2.4
-    //calling the immediate generator function 
-  
+{  
     Signal select = 1;
     int sign_extended;
 
     int pipe_cycle = 1;
     ControlSignals *signals = (ControlSignals *)malloc(sizeof(ControlSignals));
 
-    Set *pipeInstrs = set(); //TODO: find a better name for this that makes more sense
+    Set *pipeInstrs = set();
 
     //figuring out how many clock cycles will be in the pipeline 
     int total_cycles = 0;
@@ -592,7 +566,6 @@ bool tickFunc(Core *core)
 
     // creating pipeline while-loop
     while(pipe_cycle <= 10){
-      //printf("%d\n", pipe_cycle);
       // Steps may include
       // (Step 1) Reading instruction from instruction memory
 
@@ -601,8 +574,13 @@ bool tickFunc(Core *core)
       //{
         instruction = core->instr_mem->instructions[core->PC / 4].instruction;
         //printf("This is the instruction %d:\n", instruction);
+        // increment the PC
+        if (select == 1){
         core->PC += 4;
-      
+        }
+        else{
+          core->PC += curExecute->imm11_0_sign_extended * 4;
+        }
         ++core->clk;
       //}
       
@@ -623,13 +601,6 @@ bool tickFunc(Core *core)
 
       // FETCH
       if(pipe_cycle >= 1 && pipe_cycle <= 5){ //TODO: make the int values of this if-statment variable dependentso they work for any number of instructions
-        /*
-        printf("\n");
-        for(int h = 31; h>=0; h--){
-          printf("%d ", imme_binary[h]);
-        }
-        printf("\n");
-        */
         setInsert(pipeInstrs, imme_binary);
       }
 
@@ -642,14 +613,7 @@ bool tickFunc(Core *core)
         else{
           curDecode = pipeInstrs->head;
         }
-        //TODO: debug our decode functionality 
-        /*
-        printf("\n");
-        for(int h = 31; h>=0; h--){
-          printf("%d ", curDecode->fetch[h]);
-        }
-        printf("\n");
-        */
+
         curDecode->opcode = opcode_parse(curDecode->fetch);
         
         //printf("THis is the curdecode opcode: %d\n", curDecode->opcode);
@@ -688,7 +652,6 @@ bool tickFunc(Core *core)
         }
 
         curOpCode = curExecute->opcode;
-        //printf("This is the opcode: %d\n", curOpCode);
         
         if (curOpCode == 51){
           RType(curExecute, core, signals);
@@ -707,7 +670,7 @@ bool tickFunc(Core *core)
           sign_extended = ImmeGen(deci_imm);
           curExecute->imm11_0 = *binary_immediate;
           curExecute->imm11_0_sign_extended = sign_extended;
-          //printf("This is the signextened: %d\n", curExecute->imm11_0_sign_extended);
+
           // ld function call
           if (curExecute->funct3 == 3){
             ldExec(curExecute, core, signals);
@@ -783,12 +746,6 @@ bool tickFunc(Core *core)
         return false;
       }
     }
-    /*
-    TODO list for Pipelineing project 3:
-    
-    3. Clock cycle counter to keep track
-
-    */
  
     //STEP 2.2
     //sending the first seven bits (opcode) to the control unit 
@@ -985,8 +942,6 @@ Signal ImmeGen(int *binary_imm)
           }
       }
 
-      //printf("%s\n", deci_chars);
-
         //converting it to decimal
         int temp = atoi(deci_chars);
         Signal input_immediate = bin_to_dec(temp);
@@ -1062,3 +1017,4 @@ int bin_to_dec(int n) {
     }
     return dec;
 }
+
